@@ -47,7 +47,8 @@
 		showDelay: 200,
 		dontHideOnTooltipHover: false,
 		selector: '',
-		showOnFocus: true
+		triggerShow: 'mouseenter',
+		triggerHide: 'mouseleave'
 	},
 	eventNS = '.tooltip',
 
@@ -87,21 +88,12 @@
 		this.targetDistance = 7;
 		this.screenMargin = 20;
 		this.tooltipId = tooltipId;
-		this.event = {};
-
-		if (this.conf.showOnFocus) {
-			this.event.show = 'mouseenter focus';
-			this.event.hide = 'mouseleave blur';
-		} else {
-			this.event.show = 'mouseenter';
-			this.event.hide = 'mouseleave';
-		}
 
 		// don't animate in IE, else show as in conf
 		if (isIE || this.conf.animate === false) this.animSpeed = 0;
 
 		if (typeof this.conf.trigger === 'string') {
-			showEvent = (this.conf.trigger === 'hover' ? this.event.show : this.conf.trigger);
+			showEvent = (this.conf.trigger === 'hover' ? this.conf.triggerShow : this.conf.trigger);
 		}
 
 		// tooltip from config
@@ -123,13 +115,13 @@
 		if (this.conf.selector) {
 			this.target
 				.on(showEvent + eventNS, this.conf.selector, function (e) { self.show.call(self, e, this); })
-				.on(this.event.hide + eventNS, this.conf.selector, function (e) { self.hide.call(self, e, this); })
+				.on(this.conf.triggerHide + eventNS, this.conf.selector, function (e) { self.hide.call(self, e, this); })
 				.on('destroyed' + eventNS, this.conf.selector, function () { self.destroy.call(self); });
 		}
 		else {
 			this.target
 				.on(showEvent + eventNS, function (e) { self.show.call(self, e, this); })
-				.on(this.event.hide + eventNS, function (e) { self.hide.call(self, e, this); })
+				.on(this.conf.triggerHide + eventNS, function (e) { self.hide.call(self, e, this); })
 				.on('destroyed' + eventNS, function () { self.destroy.call(self); });
 		}
 
@@ -137,8 +129,8 @@
 
 		if (this.tooltip && this.conf.dontHideOnTooltipHover === true) {
 			this.tooltip.off(eventNS)
-				.on('mouseenter' + eventNS, function (e) { self.dontHide.call(self, e, this); })
-				.on(this.event.hide + eventNS, function (e) { self.hide.call(self, e, this); });
+				.on(this.conf.triggerShow + eventNS, function (e) { self.dontHide.call(self, e, this); })
+				.on(this.conf.triggerHide + eventNS, function (e) { self.hide.call(self, e, this); });
 		}
 
 		return this;
